@@ -4,7 +4,7 @@
 
         <ONOS>
             <host>10.1.8.245</host>
-            <user>saurav</user>
+            <user>your-login</user>
             <password>enter-your-password-here</password>
             <type>onossanityclidriver</type>
             <connect_order>1</connect_order>

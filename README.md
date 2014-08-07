@@ -1,14 +1,14 @@
 TestON, a testing infastructure by Paxterra
 =======================================
 TestON is the testing platform that all the ONOS tests are being run on currently. 
-
+This is a private fork of TestOn meant only for the segment routing tests
 
 Setup 
 -------------
 
-0. Pull the git repo from https://github.com/OPENNETWORKINGLAB/ONLabTest.git 
+0. Pull the git repo from 
 
-    $ git clone https://github.com/OPENNETWORKINGLAB/ONLabTest.git
+    $ git clone https://github.com/sauravdas2/srteston.git
 
 1. Make a symbolic link for TestON on the HOMEDIR 
    Execute the following from the home directory  
@@ -26,13 +26,11 @@ Dependencies
 ------------
 1. Zookeeper
 
-2. Cassandra
+2. ONOS
 
-3. ONOS
+3. Mininet
 
-4. Mininet
-
-5. Install python packages configObj and pexpect. they can be installed as :
+4. Install python packages configObj and pexpect. they can be installed as :
 
      $ sudo pip install configObj
 
@@ -43,16 +41,24 @@ Configuration
 
 1. Config file at TestON/config/teston.cfg
 
-    Change the file paths to the appropriate paths
+    Change the file paths to the appropriate paths. 
+    Actually you probably don't need to change anything here.
 
 2. The .topo file for each test
  
-    Must change the IPs/login/etc to point to the nodes you want to run on
+    Must change the IPs/login/etc to point to the nodes you want to run on.
+    Specifically you need to change TestON/tests/SRSanity/SRSanity.topo
+    You need to give the IP addr, login and password for the VM that is running Mininet
+    and the VM that is running the controller. Please do not commit/push this information.
+    You need to do this even if you are running TestON on the same VM as your controller
+    or Mininet VM. 
 
 Running TestON
 ------------
+0. Remember that the controller jar file should be up to date with the changes you are testing
+   i.e. you should have run 'mvn package' in the ONOS directory
 
-1. TestON must be ran from its bin directory 
+1. TestON must be run from its bin directory 
 
     $ cd TestON/bin
 
