@@ -1,0 +1,37 @@
+<PARAMS>
+    <testcases>1, 2, 3</testcases>
+    <FLOWDEF>/home/onos/ONLabTest/TestON/tests/SRSanity</FLOWDEF>
+    <INTENTS>
+
+    </INTENTS>
+    <RESTTEST>
+
+    </RESTTEST>
+    <CASE1>       
+
+    </CASE1>       
+    <PING>
+
+    </PING>
+
+    <LINK>
+
+    </LINK>
+    <YANK>
+
+    </YANK>
+    <PLUG>
+
+    </PLUG>
+    <CTRL>
+
+    </CTRL>
+    <RestIP>192.168.56.10</RestIP>
+    <NR_Switches>25</NR_Switches>
+    <NR_Links>50</NR_Links>
+    <RESTCALL>
+	<restIP1>192.168.56.10</restIP1>
+	<restPort>8080</restPort>
+
+    </RESTCALL>
+</PARAMS>      

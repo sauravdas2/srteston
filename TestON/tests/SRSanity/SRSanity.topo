@@ -1,0 +1,27 @@
+<TOPOLOGY>
+
+    <COMPONENT>
+
+        <ONOS>
+            <host>10.1.8.245</host>
+            <user>saurav</user>
+            <password>enter-your-password-here</password>
+            <type>onossanityclidriver</type>
+            <connect_order>1</connect_order>
+            <COMPONENTS>
+             </COMPONENTS>
+        </ONOS>
+
+        <Mininet>
+            <host>127.0.0.1</host>
+            <user>mininet</user>
+            <password>mininet</password>
+            <type>MininetCliDriver</type>
+            <connect_order>2</connect_order>
+            <COMPONENTS>
+
+             </COMPONENTS>
+        </Mininet>
+
+    </COMPONENT>
+</TOPOLOGY>
