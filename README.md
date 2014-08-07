@@ -1,7 +1,7 @@
 TestON, a testing infastructure by Paxterra
 =======================================
 TestON is the testing platform that all the ONOS tests are being run on currently. 
-This is a private fork of TestOn meant only for the segment routing tests
+This is a private fork of TestOn meant only for the segment routing tests.
 
 Setup 
 -------------
