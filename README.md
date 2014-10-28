@@ -13,7 +13,7 @@ Setup
 1. Make a symbolic link for TestON on the HOMEDIR 
    Execute the following from the home directory  
 
-    $ ln -s ONLabTest/TestON TestON
+    $ ln -s srteston/TestON TestON
 
 2. Make sure python path is correct 
 
@@ -41,8 +41,9 @@ Configuration
 
 1. Config file at TestON/config/teston.cfg
 
-    Change the file paths to the appropriate paths. 
-    Actually you probably don't need to change anything here.
+    Change the file paths to the appropriate TestON paths. 
+    Actually you probably don't need to change anything here unless
+    your TestON root folder is different from /home/admin/TestON.
 
 2. The .topo file for each test
  
@@ -53,6 +54,10 @@ Configuration
     You need to do this even if you are running TestON on the same VM as your controller
     or Mininet VM. 
 
+3. onossanityclidriver.py
+
+    Change the ONOS root folder path and assign to self.home variable
+ 
 Running TestON
 ------------
 0. Remember that the controller jar file should be up to date with the changes you are testing
@@ -68,7 +73,7 @@ Running TestON
 
 3. Run the test 
 
-    teston> run MininetTest 
+    teston> run SRSanity 
 
 The Tests
 -----------------------------------------------
