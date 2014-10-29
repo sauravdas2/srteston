@@ -14,6 +14,8 @@ import time
 import json
 import traceback
 import requests
+import urllib2
+from urllib2 import URLError, HTTPError
 
 sys.path.append("../")
 from drivers.common.clidriver import CLI
@@ -31,7 +33,7 @@ class onossanityclidriver(CLI):
         try:
             for key in connectargs:
                 vars(self)[key] = connectargs[key]
-            self.home = "~/projects/ONOS"
+            self.home = "~/ONOS"
             for key in self.options:
                 if key == "home":
                     self.home = self.options['home']
@@ -411,6 +413,236 @@ class onossanityclidriver(CLI):
             main.log.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
             main.cleanup()
             main.exit()
+
+    def create_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, params):
+        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
+        main.log.info(self.name+": with url & params =" +url + " " + params)
+        try:
+            request = urllib2.Request(url,params)
+            request.get_method = lambda: "POST"
+            request.add_header("Content-Type", "application/json")
+            response=urllib2.urlopen(request)
+            result = response.read()
+            response.close()
+            #if len(result) != 0:
+            #    parsed_result = json.loads(result)
+        except HTTPError as exc:
+            print "ERROR:"
+            print "  REST POST URL: %s" % url
+            # NOTE: exc.fp contains the object with the response payload
+            error_payload = json.loads(exc.fp.read())
+            print "  REST Error Code: %s" % (error_payload['code'])
+            print "  REST Error Summary: %s" % (error_payload['summary'])
+            print "  REST Error Description: %s" % (error_payload['formattedDescription'])
+            print "  HTTP Error Code: %s" % exc.code
+            print "  HTTP Error Reason: %s" % exc.reason
+            main.log.error(self.name+": HTTPError="+error_payload)
+        except URLError as exc:
+            print "ERROR:"
+            print "  REST GET URL: %s" % url
+            print "  URL Error Reason: %s" % exc.reason
+            main.log.error(self.name+": URLError="+exc.reason)
+        main.log.info(self.name+": result="+result)
+        if re.search('success',result):
+            main.log.info(self.name+": success")
+            main.last_result = main.TRUE 
+            return main.TRUE
+        else:
+            main.log.info(self.name+": failed")
+            main.last_result = main.FALSE 
+            return main.FALSE
+        
+    def convert_from_unicode(self, input):
+        if isinstance(input, dict):
+            return {self.convert_from_unicode(key): self.convert_from_unicode(value) for key, value in input.iteritems()}
+        elif isinstance(input, list):
+            return [self.convert_from_unicode(element) for element in input]
+        elif isinstance(input, unicode):
+            return input.encode('utf-8')
+        else:
+            return input
+    
+    def get_all_groups_of_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, tunnel_id):
+        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
+        main.log.info(self.name+": with url & params =" +url + " " + tunnel_id)
+        try:
+            result = urllib2.urlopen(url, None).read()
+            if len(result) != 0:
+                parsed_result = self.convert_from_unicode(json.loads(result))
+        except HTTPError as exc:
+            print "ERROR:"
+            print "  REST POST URL: %s" % url
+            # NOTE: exc.fp contains the object with the response payload
+            error_payload = json.loads(exc.fp.read())
+            print "  REST Error Code: %s" % (error_payload['code'])
+            print "  REST Error Summary: %s" % (error_payload['summary'])
+            print "  REST Error Description: %s" % (error_payload['formattedDescription'])
+            print "  HTTP Error Code: %s" % exc.code
+            print "  HTTP Error Reason: %s" % exc.reason
+            main.log.error(self.name+": HTTPError="+error_payload)
+        except URLError as exc:
+            print "ERROR:"
+            print "  REST GET URL: %s" % url
+            print "  URL Error Reason: %s" % exc.reason
+            main.log.error(self.name+": URLError="+exc.reason)
+        #main.log.info(self.name+": result="+parsed_result)
+        #print "parsed_result:",parsed_result
+        groups = [{}]
+        for entry in parsed_result:
+            if entry.has_key("tunnelId"):
+                if entry["tunnelId"] == tunnel_id:
+                    for swgroupstr in entry["dpidGroup"]:
+                        swgroup = swgroupstr.split('/')
+                        #print "SW:GROUP is",swgroup[0],swgroup[1]
+                        #Get all groups from this switch
+                        url2 = "http://%s:%s/%s/%s/%s"%(onosRESTIP,onosRESTPort,
+                                    "wm/floodlight/core/switch",swgroup[0],
+                                    "groupDesc/json")
+                        #print "url2:",url2
+                        try:
+                            result2 = urllib2.urlopen(url2, None).read()
+                            if len(result2) != 0:
+                                parsed_result2 = self.convert_from_unicode(json.loads(result2))
+                        except HTTPError as exc:
+                            print "ERROR:"
+                        except URLError as exc:
+                            print "ERROR:"
+                        allGroups = {}
+                        #print "parsed_result2: ", parsed_result2
+                        for groupStat in parsed_result2[swgroup[0]]:
+                            gotoGroup = -1
+                            if groupStat['bucketsActions'][0].has_key('goToGroup'):
+                                gotoGroup = groupStat['bucketsActions'][0]['goToGroup']
+                            allGroups[groupStat['groupId']] = gotoGroup
+                        #print "All groups: ",allGroups
+                        groupChain = []
+                        groupChain.append(int(swgroup[1]))
+                        nextInChain = allGroups[int(swgroup[1])]
+                        while nextInChain != -1:
+                            groupChain.append(nextInChain)
+                            nextInChain = allGroups[nextInChain]
+                        groups.append({"SW": swgroup[0],
+                                       "GROUPS":groupChain,
+                                      })
+        #print "groups for tunnel are:",groups
+        return groups
+    
+    def delete_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, params):
+        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
+        main.log.info(self.name+": Delete a Tunnel in ONOS controller with url & params ="
+                      +url + " " + params)
+        try:
+            request = urllib2.Request(url,params)
+            request.get_method = lambda: "DELETE"
+            request.add_header("Content-Type", "application/json")
+            response=urllib2.urlopen(request)
+            result = response.read()
+            response.close()
+            #if len(result) != 0:
+            #    parsed_result = json.loads(result)
+        except HTTPError as exc:
+            print "ERROR:"
+            print "  REST POST URL: %s" % url
+            # NOTE: exc.fp contains the object with the response payload
+            error_payload = json.loads(exc.fp.read())
+            print "  REST Error Code: %s" % (error_payload['code'])
+            print "  REST Error Summary: %s" % (error_payload['summary'])
+            print "  REST Error Description: %s" % (error_payload['formattedDescription'])
+            print "  HTTP Error Code: %s" % exc.code
+            print "  HTTP Error Reason: %s" % exc.reason
+            main.log.error(self.name+": HTTPError="+error_payload)
+        except URLError as exc:
+            print "ERROR:"
+            print "  REST GET URL: %s" % url
+            print "  URL Error Reason: %s" % exc.reason
+            main.log.error(self.name+": URLError="+exc.reason)
+        main.log.info(self.name+": result="+result)
+        if re.search('success',result):
+            main.log.info(self.name+": success")
+            main.last_result = main.TRUE 
+            return main.TRUE
+        else:
+            main.log.info(self.name+": failed")
+            main.last_result = main.FALSE 
+            return main.FALSE
+    
+    def create_policy(self, onosRESTIP, onosRESTPort, policyURL, params):
+        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,policyURL)
+        main.log.info(self.name+": Create a Policy in ONOS controller with url & params ="
+                      +url + " " + params)
+        try:
+            request = urllib2.Request(url,params)
+            request.get_method = lambda: "POST"
+            request.add_header("Content-Type", "application/json")
+            response=urllib2.urlopen(request)
+            result = response.read()
+            response.close()
+            #if len(result) != 0:
+            #    parsed_result = json.loads(result)
+        except HTTPError as exc:
+            print "ERROR:"
+            print "  REST POST URL: %s" % url
+            # NOTE: exc.fp contains the object with the response payload
+            error_payload = json.loads(exc.fp.read())
+            print "  REST Error Code: %s" % (error_payload['code'])
+            print "  REST Error Summary: %s" % (error_payload['summary'])
+            print "  REST Error Description: %s" % (error_payload['formattedDescription'])
+            print "  HTTP Error Code: %s" % exc.code
+            print "  HTTP Error Reason: %s" % exc.reason
+            main.log.error(self.name+": HTTPError="+error_payload)
+        except URLError as exc:
+            print "ERROR:"
+            print "  REST GET URL: %s" % url
+            print "  URL Error Reason: %s" % exc.reason
+            main.log.error(self.name+": URLError="+exc.reason)
+        main.log.info(self.name+": result="+result)
+        if re.search('success',result):
+            main.log.info(self.name+": Create tunnel success")
+            main.last_result = main.TRUE 
+            return main.TRUE
+        else:
+            main.log.info(self.name+": Create tunnel failed")
+            main.last_result = main.FALSE 
+            return main.FALSE
+
+    def delete_policy(self, onosRESTIP, onosRESTPort, policyURL, params):
+        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,policyURL)
+        main.log.info(self.name+": Delete a Policy in ONOS controller with url & params ="
+                      +url + " " + params)
+        try:
+            request = urllib2.Request(url,params)
+            request.get_method = lambda: "DELETE"
+            request.add_header("Content-Type", "application/json")
+            response=urllib2.urlopen(request)
+            result = response.read()
+            response.close()
+            #if len(result) != 0:
+            #    parsed_result = json.loads(result)
+        except HTTPError as exc:
+            print "ERROR:"
+            print "  REST POST URL: %s" % url
+            # NOTE: exc.fp contains the object with the response payload
+            error_payload = json.loads(exc.fp.read())
+            print "  REST Error Code: %s" % (error_payload['code'])
+            print "  REST Error Summary: %s" % (error_payload['summary'])
+            print "  REST Error Description: %s" % (error_payload['formattedDescription'])
+            print "  HTTP Error Code: %s" % exc.code
+            print "  HTTP Error Reason: %s" % exc.reason
+            main.log.error(self.name+": HTTPError="+error_payload)
+        except URLError as exc:
+            print "ERROR:"
+            print "  REST GET URL: %s" % url
+            print "  URL Error Reason: %s" % exc.reason
+            main.log.error(self.name+": URLError="+exc.reason)
+        main.log.info(self.name+": result="+result)
+        if re.search('deleted',result):
+            main.log.info(self.name+": success")
+            main.last_result = main.TRUE 
+            return main.TRUE
+        else:
+            main.log.info(self.name+": failed")
+            main.last_result = main.FALSE 
+            return main.FALSE
 
     def add_flow(self, intentFile, path):
 	try:
