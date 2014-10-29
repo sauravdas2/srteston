@@ -527,6 +527,36 @@ class onossanityclidriver(CLI):
         #print "groups for tunnel are:",groups
         return groups
     
+    def get_switch_group_stats(self, onosRESTIP, onosRESTPort, dpid):
+        url = "http://%s:%s/%s/%s/%s"%(onosRESTIP,onosRESTPort,
+                    "wm/floodlight/core/switch",dpid,
+                    "groupStats/json")
+        main.log.info(self.name+": with url =" +url)
+        try:
+            result = urllib2.urlopen(url, None).read()
+            if len(result) != 0:
+                parsed_result = self.convert_from_unicode(json.loads(result))
+                #print parsed_result
+                return parsed_result[dpid]
+        except HTTPError as exc:
+            print "ERROR:"
+            print "  REST POST URL: %s" % url
+            # NOTE: exc.fp contains the object with the response payload
+            error_payload = json.loads(exc.fp.read())
+            print "  REST Error Code: %s" % (error_payload['code'])
+            print "  REST Error Summary: %s" % (error_payload['summary'])
+            print "  REST Error Description: %s" % (error_payload['formattedDescription'])
+            print "  HTTP Error Code: %s" % exc.code
+            print "  HTTP Error Reason: %s" % exc.reason
+            main.log.error(self.name+": HTTPError="+error_payload)
+        except URLError as exc:
+            print "ERROR:"
+            print "  REST GET URL: %s" % url
+            print "  URL Error Reason: %s" % exc.reason
+            main.log.error(self.name+": URLError="+exc.reason)
+            
+        return main.FALSE
+            
     def delete_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, params):
         url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
         main.log.info(self.name+": Delete a Tunnel in ONOS controller with url & params ="
