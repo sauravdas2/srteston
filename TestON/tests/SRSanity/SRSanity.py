@@ -243,15 +243,7 @@ class SRSanity:
         main.log.report("Running mininet")
         main.Mininet.connect()
         #main.Mininet.handle.sendline("sudo mn -c")
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/test13_3sw.py")
-=======
-        main.Mininet.handle.sendline("sudo ./tests/test13_3sw.py")
->>>>>>> Stashed changes
-=======
-        main.Mininet.handle.sendline("sudo ./tests/test13_3sw.py")
->>>>>>> Stashed changes
         main.step("waiting 20 secs for switches to connect and go thru handshake")
         time.sleep(20)
         #main.step("verifying all to all connectivity")
@@ -267,4 +259,37 @@ class SRSanity:
         main.Mininet.disconnect()
         #main.Mininet.cleanup()
         #main.Mininet.exit()
-        
+       
+
+#**********************************************************************************************************************************************************************************************
+# Restarts the controller in a linear 3-node topology
+
+    def CASE20(self,main) :
+        main.ONOS.stop()
+        # starts the controller with 3-node topology
+        main.ONOS.handle.sendline("sed -i 's/sr-.*$/sr-ring.conf/' conf/onos.properties")
+        main.step("Restarting ONOS and Zookeeper")
+        ret = main.ONOS.start()
+        if ret == main.FALSE:
+            main.log.report("ONOS did not start ... Aborting")
+            main.cleanup()
+            main.exit()
+        main.log.report("Running mininet")
+        main.Mininet.connect()
+        #main.Mininet.handle.sendline("sudo mn -c")
+        main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testRing_5sw.py")
+        main.step("waiting 20 secs for switches to connect and go thru handshake")
+        time.sleep(20)
+        #main.step("verifying all to all connectivity")
+
+        p1 = main.Mininet.pingHost(SRC="h1",TARGET="192.168.0.2")
+        p2 = main.Mininet.pingall()
+        result = p1 and p2
+
+        utilities.assert_equals(expect=main.TRUE,actual=result,
+                                onpass="Default connectivity check PASS",
+                                onfail="Default connectivity check FAIL")
+        #cleanup mininet
+        main.Mininet.disconnect()
+        #main.Mininet.cleanup()
+        #main.Mininet.exit() 
