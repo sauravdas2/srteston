@@ -243,7 +243,15 @@ class SRSanity:
         main.log.report("Running mininet")
         main.Mininet.connect()
         #main.Mininet.handle.sendline("sudo mn -c")
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/test13_3sw.py")
+=======
+        main.Mininet.handle.sendline("sudo ./tests/test13_3sw.py")
+>>>>>>> Stashed changes
+=======
+        main.Mininet.handle.sendline("sudo ./tests/test13_3sw.py")
+>>>>>>> Stashed changes
         main.step("waiting 20 secs for switches to connect and go thru handshake")
         time.sleep(20)
         #main.step("verifying all to all connectivity")
