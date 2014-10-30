@@ -415,7 +415,7 @@ class onossanityclidriver(CLI):
             main.exit()
 
     def create_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, params):
-        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
+        url = "http://%s:%s/%s"%(self.ip_address,"8080",tunnelURL)
         main.log.info(self.name+": with url & params =" +url + " " + params)
         try:
             request = urllib2.Request(url,params)
@@ -463,7 +463,7 @@ class onossanityclidriver(CLI):
             return input
     
     def get_all_groups_of_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, tunnel_id):
-        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
+        url = "http://%s:%s/%s"%(self.ip_address,"8080",tunnelURL)
         main.log.info(self.name+": with url & params =" +url + " " + tunnel_id)
         try:
             result = urllib2.urlopen(url, None).read()
@@ -495,7 +495,7 @@ class onossanityclidriver(CLI):
                         swgroup = swgroupstr.split('/')
                         #print "SW:GROUP is",swgroup[0],swgroup[1]
                         #Get all groups from this switch
-                        url2 = "http://%s:%s/%s/%s/%s"%(onosRESTIP,onosRESTPort,
+                        url2 = "http://%s:%s/%s/%s/%s"%(self.ip_address,"8080",
                                     "wm/floodlight/core/switch",swgroup[0],
                                     "groupDesc/json")
                         #print "url2:",url2
@@ -528,7 +528,7 @@ class onossanityclidriver(CLI):
         return groups
     
     def get_switch_group_stats(self, onosRESTIP, onosRESTPort, dpid):
-        url = "http://%s:%s/%s/%s/%s"%(onosRESTIP,onosRESTPort,
+        url = "http://%s:%s/%s/%s/%s"%(self.ip_address,"8080",
                     "wm/floodlight/core/switch",dpid,
                     "groupStats/json")
         main.log.info(self.name+": with url =" +url)
@@ -558,7 +558,7 @@ class onossanityclidriver(CLI):
         return main.FALSE
             
     def delete_tunnel(self, onosRESTIP, onosRESTPort, tunnelURL, params):
-        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,tunnelURL)
+        url = "http://%s:%s/%s"%(self.ip_address,"8080",tunnelURL)
         main.log.info(self.name+": Delete a Tunnel in ONOS controller with url & params ="
                       +url + " " + params)
         try:
@@ -597,7 +597,7 @@ class onossanityclidriver(CLI):
             return main.FALSE
     
     def create_policy(self, onosRESTIP, onosRESTPort, policyURL, params):
-        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,policyURL)
+        url = "http://%s:%s/%s"%(self.ip_address,"8080",policyURL)
         main.log.info(self.name+": Create a Policy in ONOS controller with url & params ="
                       +url + " " + params)
         try:
@@ -636,7 +636,7 @@ class onossanityclidriver(CLI):
             return main.FALSE
 
     def delete_policy(self, onosRESTIP, onosRESTPort, policyURL, params):
-        url = "http://%s:%s/%s"%(onosRESTIP,onosRESTPort,policyURL)
+        url = "http://%s:%s/%s"%(self.ip_address,"8080",policyURL)
         main.log.info(self.name+": Delete a Policy in ONOS controller with url & params ="
                       +url + " " + params)
         try:
