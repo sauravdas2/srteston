@@ -49,8 +49,8 @@ class SRSanity:
         import time
         main.log.report("Running mininet")
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testEcmp_6sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         main.step("verifying all to all connectivity")
         
         p1 = main.Mininet.pingHost(SRC="h2",TARGET="h1")
@@ -75,8 +75,8 @@ class SRSanity:
         main.log.report("Running mininet")
         main.Mininet.connect()
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testEcmp_6sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         main.step("verifying all to all connectivity")
         
         p1 = main.Mininet.pingHost(SRC="h2",TARGET="h1")
@@ -91,8 +91,8 @@ class SRSanity:
         main.Mininet.yankcpqd(SW="s1",INTF="s1-eth3")
         main.Mininet.yankcpqd(SW="s2",INTF="s2-eth3")
         main.Mininet.yankcpqd(SW="s4",INTF="s4-eth3")
-        main.step("waiting 20 secs for controller to perform recovery operations")
-        time.sleep(20)
+        main.step("waiting 40 secs for controller to perform recovery operations")
+        time.sleep(40)
         main.step("verifying connectivity between hosts after link down")
         p1 = main.Mininet.pingHost(SRC="h1",TARGET="h2")
         result_during_failure = p1
@@ -109,8 +109,8 @@ class SRSanity:
         main.Mininet.link(END1="s1",END2="s3",OPTION="up")
         main.Mininet.link(END1="s2",END2="s5",OPTION="up")
         main.Mininet.link(END1="s4",END2="s6",OPTION="up")
-        main.step("waiting 20 secs for controller to perform recovery operations")
-        time.sleep(20)
+        main.step("waiting 40 secs for controller to perform recovery operations")
+        time.sleep(40)
         main.step("verifying connectivity between hosts after link down")
         p1 = main.Mininet.pingHost(SRC="h1",TARGET="h2")
         result_during_recovery = p1
@@ -145,8 +145,8 @@ class SRSanity:
         main.log.report("Running mininet")
         main.Mininet.connect()
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testEcmp_6sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         main.step("verifying all to all connectivity")
         
         p1 = main.Mininet.pingHost(SRC="h2",TARGET="h1")
@@ -183,9 +183,9 @@ class SRSanity:
                 #print "entry[SW]: ",entry['SW']
                 if (entry['SW'] == "00:00:00:00:00:00:00:01"):
                     ret_sw1 = main.TRUE
-                    if (len(entry['GROUPS']) == 3):
+                    if (len(entry['GROUPS']) == 2):
                         ret_sw1_3groups = main.TRUE
-                if (entry['SW'] == "00:00:00:00:00:00:00:05"):
+                if (entry['SW'] == "00:00:00:00:00:00:00:04"):
                     ret_sw5 = main.TRUE
                     if (len(entry['GROUPS']) == 1):
                         ret_sw5_1groups = main.TRUE
@@ -306,8 +306,8 @@ class SRSanity:
         main.log.report("Running mininet")
         main.Mininet.connect()
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testEcmp_6sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         main.step("verifying all to all connectivity")
 
         p1 = main.Mininet.pingHost(SRC="h2",TARGET="h1")
@@ -333,7 +333,7 @@ class SRSanity:
                                       onosRESTPort=str(8080),
                                       tunnelURL="wm/onos/segmentrouting/tunnel",
                                       tunnel_id="t2")
-        print "Groups created for tunnel t1",switch_groups
+        print "Groups created for tunnel t2",switch_groups
         ret_sw1 = main.FALSE
         ret_sw5 = main.FALSE
         ret_sw1_3groups = main.FALSE
@@ -344,9 +344,9 @@ class SRSanity:
                 #print "entry[SW]: ",entry['SW']
                 if (entry['SW'] == "00:00:00:00:00:00:00:01"):
                     ret_sw1 = main.TRUE
-                    if (len(entry['GROUPS']) == 3):
+                    if (len(entry['GROUPS']) == 2):
                         ret_sw1_3groups = main.TRUE
-                if (entry['SW'] == "00:00:00:00:00:00:00:05"):
+                if (entry['SW'] == "00:00:00:00:00:00:00:04"):
                     ret_sw5 = main.TRUE
                     if (len(entry['GROUPS']) == 1):
                         ret_sw5_1groups = main.TRUE
@@ -450,7 +450,6 @@ class SRSanity:
         #cleanup mininet
         main.Mininet.disconnect()
 
-
 #**********************************************************************************************************************************************************************************************
 # A simple test for verifying tunnels and policies with adjacencySid with multiple ports
 
@@ -468,8 +467,8 @@ class SRSanity:
         main.log.report("Running mininet")
         main.Mininet.connect()
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testEcmp_10sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         main.step("verifying all to all connectivity")
 
         p1 = main.Mininet.pingHost(SRC="h1",TARGET="h2")
@@ -624,8 +623,8 @@ class SRSanity:
         main.Mininet.connect()
         #main.Mininet.handle.sendline("sudo mn -c")
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/test13_3sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         #main.step("verifying all to all connectivity")
         
         p1 = main.Mininet.pingHost(SRC="h1",TARGET="h6")
@@ -658,8 +657,8 @@ class SRSanity:
         main.Mininet.connect()
         #main.Mininet.handle.sendline("sudo mn -c")
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testRing_5sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         #main.step("verifying all to all connectivity")
 
         p1 = main.Mininet.pingHost(SRC="h1",TARGET="192.168.0.2")
@@ -691,8 +690,8 @@ class SRSanity:
         main.Mininet.connect()
         #main.Mininet.handle.sendline("sudo mn -c")
         main.Mininet.handle.sendline("sudo python /home/onos/mininet/custom/testEcmp_10sw.py")
-        main.step("waiting 20 secs for switches to connect and go thru handshake")
-        time.sleep(20)
+        main.step("waiting 40 secs for switches to connect and go thru handshake")
+        time.sleep(40)
         #main.step("verifying all to all connectivity")
 
         p1 = main.Mininet.pingHost(SRC="h1",TARGET="192.168.0.5")
