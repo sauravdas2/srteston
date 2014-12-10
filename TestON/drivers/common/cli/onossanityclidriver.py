@@ -493,20 +493,22 @@ class onossanityclidriver(CLI):
                 if entry["tunnelId"] == tunnel_id:
                     for swgroupstr in entry["dpidGroup"]:
                         swgroup = swgroupstr.split('/')
+			swgroup1 = swgroup[1]
+			swgroup = swgroup[0].split('(')
                         #print "SW:GROUP is",swgroup[0],swgroup[1]
                         #Get all groups from this switch
                         url2 = "http://%s:%s/%s/%s/%s"%(self.ip_address,"8080",
                                     "wm/floodlight/core/switch",swgroup[0],
                                     "groupDesc/json")
-                        #print "url2:",url2
+                        print "url2:",url2
                         try:
                             result2 = urllib2.urlopen(url2, None).read()
                             if len(result2) != 0:
                                 parsed_result2 = self.convert_from_unicode(json.loads(result2))
                         except HTTPError as exc:
-                            print "ERROR:"
+                            print "HTTP ERROR:"
                         except URLError as exc:
-                            print "ERROR:"
+                            print "URL ERROR:"
                         allGroups = {}
                         #print "parsed_result2: ", parsed_result2
                         for groupStat in parsed_result2[swgroup[0]]:
@@ -516,8 +518,8 @@ class onossanityclidriver(CLI):
                             allGroups[groupStat['groupId']] = gotoGroup
                         #print "All groups: ",allGroups
                         groupChain = []
-                        groupChain.append(int(swgroup[1]))
-                        nextInChain = allGroups[int(swgroup[1])]
+                        groupChain.append(int(swgroup1))
+                        nextInChain = allGroups[int(swgroup1)]
                         while nextInChain != -1:
                             groupChain.append(nextInChain)
                             nextInChain = allGroups[nextInChain]
